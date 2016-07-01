@@ -1,0 +1,5 @@
+name = Site Information
+description = Override existing site information form.
+package = Custom
+version = VERSION
+core = 7.x

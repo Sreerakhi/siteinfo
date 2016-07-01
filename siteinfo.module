@@ -1,0 +1,38 @@
+<?php
+/**
+ * @file
+ * Main module file.
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function siteinfo_form_system_site_information_settings_alter(&$form, &$form_state, $form_id) {
+
+  // Add new text field for Site API Key.
+  $form['site_information']['siteapikey'] = array(
+    '#title' => t('Site API Key'),
+    '#description' => t('Site api key.'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('siteapikey') ? check_plain(variable_get('siteapikey')) : '',
+    '#attributes' => array(
+      'placeholder' => t('No API Key yet'),
+     ),
+  );
+
+  // Change Save configuration button text.
+  $form['actions']['submit']['#value'] = t('Update Configuration');
+
+  // Add custom submit handler.
+  $form['#submit'][] = 'siteinfo_form_system_site_information_settings_submit';
+}
+
+/**
+ * Custom submit handler for site information form.
+ */
+function siteinfo_form_system_site_information_settings_submit($form, &$form_state) {
+  if ($form_state['values']['siteapikey'] !== '') {
+    $message = check_plain(t('Site API Key has been saved.') . ' ' . $form_state['values']['siteapikey']);
+    drupal_set_message($message);
+  }
+}
