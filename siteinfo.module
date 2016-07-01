@@ -5,6 +5,18 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function siteinfo_menu() {
+  $items['page_json/%/%'] = array(
+    'access callback' => TRUE,
+    'page callback' => 'siteinfo_json_callback',
+    'page arguments' => array(1, 2)
+  );
+  return $items;
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function siteinfo_form_system_site_information_settings_alter(&$form, &$form_state, $form_id) {
@@ -34,5 +46,30 @@ function siteinfo_form_system_site_information_settings_submit($form, &$form_sta
   if ($form_state['values']['siteapikey'] !== '') {
     $message = check_plain(t('Site API Key has been saved.') . ' ' . $form_state['values']['siteapikey']);
     drupal_set_message($message);
+  }
+}
+
+/**
+ * Custom function to convert node into JSON.
+ * @param (string)
+ *  Site API key
+ * @param (int)
+ *  Node ID
+ */
+function siteinfo_json_callback($site_api_key, $nid) {
+  // Check if the nid is available and load node.
+  if (isset($nid) && $node = node_load($nid)) {
+    // Check Site API key is valid.
+    $siteapikey = (variable_get('siteapikey') == $site_api_key) ? variable_get('siteapikey') : '';
+    // Check siteapikey is not null and node is type of page.
+    if ($siteapikey !== '' && $node->type == 'page') {
+      return drupal_json_output($node);
+    }
+    else {
+      return drupal_access_denied();
+    }
+  }
+  else {
+    return drupal_access_denied();
   }
 }
